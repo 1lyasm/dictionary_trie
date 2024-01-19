@@ -190,66 +190,32 @@ void runMainLoop(struct Trie *trie) {
   free(response);
 }
 
-void printTrie(struct Trie *trie) {
-  int queueSize = 1024;
-  struct TrieNode **queue = calloc(queueSize, sizeof(struct TrieNode *));
-  int start = 0;
-  int end = 0;
+void printIndents(int nIndent) {
   int i;
-  int levelsSize = 256;
-  int levelsLen = 0;
-  int *levels = calloc(levelsSize, sizeof(int));
-  int level = 0;
-  int isLBrace = 1;
-  queue[0] = trie->root;
-  levels[levelsLen++] = 0;
-  printf("Trie: ");
-  while (start <= end) {
-    int canPrintRBrace = 0;
-    struct TrieNode *visited = queue[start];
-    start = (start + 1) % queueSize;
-
-    printf("levels: ");
-    for (i = 0; i < levelsLen; ++i) {
-        printf("%d ", levels[i]);
-    }
-
-    if (level == 0 || levels[start] != level) {
-        if (isLBrace == 1) {
-            printf("{ ");
-        } else {
-            canPrintRBrace = 1;
-        }
-        isLBrace = !isLBrace;
-        level = levels[start];
-    }
-
-    if (visited->word != NULL) {
-      printf("'%s' ", visited->word);
-    }
-
-    if (canPrintRBrace == 1) {
-        printf(" }\n");
-        canPrintRBrace = 0;
-    }
-
-    for (i = 0; i < CHILD_COUNT; ++i) {
-      if (visited->childs[i] != NULL) {
-        end = (end + 1) % queueSize;
-
-        queue[end] = visited->childs[i];
-
-        levels[levelsLen] = level;
-        printf("levels[%d]: %d\n", levelsLen, level);
-        ++levelsLen;
-      }
-    }
-    ++level;
-    printf("level: %d\n", level);
+  for (i = 0; i < nIndent; ++i) {
+    printf("    ");
   }
+}
 
-  free(levels);
-  free(queue);
+void printSubTrie(struct TrieNode *root, int nIndent) {
+  int i;
+  printIndents(nIndent);
+  if (root->word != NULL) {
+    printf("\"%s\"\n", root->word);
+  } else {
+    printf("NULL\n");
+  }
+  for (i = 0; i < CHILD_COUNT; ++i) {
+    if (root->childs[i] != NULL) {
+      printSubTrie(root->childs[i], nIndent + 1);
+    }
+  }
+}
+
+void printTrie(struct Trie *trie) {
+  printf("Trie: {\n");
+  printSubTrie(trie->root, 1);
+  printf("\n}\n");
 }
 
 int main() {
