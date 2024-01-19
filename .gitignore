@@ -1,0 +1,7 @@
+.vs
+*.user
+x64
+*.txt
+.idea
+cmake-build-debug
+main
